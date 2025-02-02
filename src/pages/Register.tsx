@@ -5,6 +5,12 @@ import InputErrorMessage from '../components/ui/InputErrorMessage'
 import { REGISTER_FORM } from '../data'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { registerSchema } from '../validation'
+import axiosInstance from '../config/axios.config'
+import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { useState } from 'react'
+import { AxiosError } from 'axios'
+import { IErrorResponse } from '../interfaces'
 
 interface IFormInput {
   username: string
@@ -13,17 +19,52 @@ interface IFormInput {
 }
 
 const RegisterPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const { register, formState: { errors }, handleSubmit } = useForm<IFormInput>({
     resolver: yupResolver(registerSchema),
   });
-  const onSubmit: SubmitHandler<IFormInput> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    console.log(data);
+    setIsLoading(true);
+
+    try {
+      const { status } = await axiosInstance.post('/auth/local/register', data);
+      if (status === 200) {
+        toast.success(
+          "You will navigate to the login page after 2 seconds to login.",
+          {
+            position: "bottom-center",
+            duration: 1500,
+            style: {
+              backgroundColor: "black",
+              color: "white",
+              width: "fit-content",
+            },
+          }
+        );
+
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
+    } catch (error) {
+      const errorObj = error as AxiosError<IErrorResponse>;
+      toast.error(`${errorObj.response?.data.error.message}`, {
+        position: "bottom-center",
+        duration: 4000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   console.log(errors)
 
   // Renders
-  const renderRegisterForm = REGISTER_FORM.map(({ name, placeholder, type, validation}, index) => {
+  const renderRegisterForm = REGISTER_FORM.map(({ name, placeholder, type, validation }, index) => {
     return (
       <div key={index}>
-        <Input type={type} placeholder={placeholder} {...register(name , validation)} />
+        <Input type={type} placeholder={placeholder} {...register(name, validation)} />
         {errors[name] &&
           <InputErrorMessage msg={errors[name]?.message} />
         }
@@ -35,8 +76,10 @@ const RegisterPage = () => {
       <h2 className="text-center mb-4 text-3xl font-semibold">
         Register to get access!
       </h2>
+
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} >
         {renderRegisterForm}
+
         {/* <div>
         <Input placeholder='Username' {...register('username', { required: true, minLength: 5 })} />
         {errors.username?.type === "required" && (
@@ -67,8 +110,8 @@ const RegisterPage = () => {
         )}
         </div> */}
 
-        <Button fullWidth >
-          Register
+        <Button fullWidth isLoading={isLoading} >
+          {isLoading ? "Loading..." : "Register"}
         </Button>
       </form>
     </div>
