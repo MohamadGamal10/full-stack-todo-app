@@ -35,4 +35,5 @@ export interface ILoginInput {
     id: number;
     title: string;
     description: string;
+    documentId?: string;
   }

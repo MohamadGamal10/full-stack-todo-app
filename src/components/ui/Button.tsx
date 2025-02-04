@@ -8,7 +8,7 @@ const buttonVariants = cva("flex items-center justify-center rounded-md font-med
       // ** FILLED
       default: "bg-slate-900 dark:bg-indigo-600 dark:text-white dark:hover:bg-indigo-700",
       danger: "bg-red-900 dark:bg-red-600 dark:text-white dark:hover:bg-red-700",
-      cancel: "bg-gray-300 text-gray-700 dark:bg-gray-500 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-400",
+      cancel: "bg-gray-300 text-gray-700 dark:bg-[#f5f5fa] dark:text-dark hover:bg-gray-400 dark:hover:bg-gray-200",
 
       // ** OUTLINE
       outline:
@@ -31,11 +31,12 @@ const buttonVariants = cva("flex items-center justify-center rounded-md font-med
 interface ButtonProps extends HTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   children: ReactNode;
   isLoading?: boolean;
+  type?: "submit" | "button" | "reset";
 }
 
-const Button = ({ isLoading, variant, size, fullWidth, className, children, ...props }: ButtonProps) => {
+const Button = ({ isLoading, variant, size, fullWidth, className, children,  type, ...props }: ButtonProps) => {
   return (
-    <button className={cn(buttonVariants({ variant, size, fullWidth, className }))} {...props} disabled={isLoading}>
+    <button type={type} className={cn(buttonVariants({ variant, size, fullWidth, className }))} {...props} disabled={isLoading}>
       {isLoading ? (<svg
         className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
         xmlns="http://www.w3.org/2000/svg"
