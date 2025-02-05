@@ -6,6 +6,7 @@ import ErrorHandler from "../components/errors/ErrorHandler";
 import HomePage from "../pages";
 import LoginPage from "../pages/Login";
 import RegisterPage from "../pages/Register";
+import TodosPage from "../pages/Todos";
 
 // const isLoggedIn = false;
 const userDataString = localStorage.getItem('loggedInUser');
@@ -34,6 +35,18 @@ const router = createBrowserRouter(
           }
         />
         <Route
+          path="/todos"
+          element={
+            <ProtectedRoute
+              isAllowed={userData?.jwt}
+              redirectPath="/login"
+              data={userData}
+            >
+              <TodosPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="login"
           element={
             <ProtectedRoute isAllowed={!userData?.jwt} redirectPath="/" data={userData}>
@@ -41,7 +54,7 @@ const router = createBrowserRouter(
             </ProtectedRoute>
           }
         />
-          <Route
+        <Route
           path="register"
           element={
             // <ProtectedRoute
@@ -49,7 +62,7 @@ const router = createBrowserRouter(
             //   redirectPath="/login"
             //   data={userData}
             // >
-              <RegisterPage />
+            <RegisterPage />
             // {/* </ProtectedRoute> */}
           }
         />
